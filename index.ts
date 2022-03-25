@@ -35,25 +35,38 @@ const HOST_FEE_DENOMINATOR = 100;
 
 async function main() {
     const tokenSwapAccount = Keypair.generate();
-
+    console.info("tokenSwapAccount", tokenSwapAccount.publicKey.toString());
+    
+    console.log('finding swap authority PDA');
     // swap authority
-    const [authority, bumpSeed] = await PublicKey.findProgramAddress(
+    const [swapAuthority, nonce] = await PublicKey.findProgramAddress(
         [tokenSwapAccount.publicKey.toBuffer()],
         TOKEN_SWAP_PROGRAM_ID,
     );
+    console.info("authority", swapAuthority.toString());
 
     // owner of the swap pool and token mint accounts
     const owner: Signer = await createUser(2 * LAMPORTS_PER_SOL);
-    const feePayer: Signer = owner;;
+    const feePayer: Signer = owner;
 
+    console.info("owner", owner.publicKey.toString());
+
+    console.log('Creating mints and token accounts');
     const mintX: PublicKey = await createTokenMint(owner.publicKey, feePayer);
     const mintY: PublicKey = await createTokenMint(owner.publicKey, feePayer);
-    const mintPool: PublicKey = await createTokenMint(authority, feePayer, 2);
+    const mintPool: PublicKey = await createTokenMint(swapAuthority, feePayer, 2);
+    console.info("mintX", mintX.toString());
+    console.info("mintY", mintY.toString());
+    console.info("mintPool", mintPool.toString());
 
-    const tokenAccountX: MintAccount = await getOrCreateATA(mintX, feePayer, owner.publicKey);
-    const tokenAccountY: MintAccount = await getOrCreateATA(mintY, feePayer, owner.publicKey);
+    const tokenAccountX: MintAccount = await getOrCreateATA(mintX, feePayer, swapAuthority);
+    const tokenAccountY: MintAccount = await getOrCreateATA(mintY, feePayer, swapAuthority);
     const tokenAccountPool: MintAccount = await getOrCreateATA(mintPool, feePayer, owner.publicKey);
     const feeAccount: MintAccount = await getOrCreateATA(mintPool, feePayer, owner.publicKey);
+    console.info("tokenAccountX", tokenAccountX.address.toString());
+    console.info("tokenAccountY", tokenAccountY.address.toString());
+    console.info("tokenAccountPool", tokenAccountPool.address.toString());
+    console.info("feeAccount", feeAccount.address.toString());
 
     console.log("Minting token X");
     await mintTo(
@@ -78,17 +91,18 @@ async function main() {
     // console.log(tokenAccountX.mint, mintX, tokenAccountX.mint.toString() === mintX.toString());
     // console.log(tokenAccountX.mint, mintY, tokenAccountY.mint.toString() === mintY.toString());
     // console.log(feeAccount.mint, mintPool, feeAccount.mint.toString() === mintPool.toString());
-
+    // tokenProgramId: PublicKey, nonce: number, tradeFeeNumerator: number, tradeFeeDenominator: number, ownerTradeFeeNumerator: number, ownerTradeFeeDenominator: number, ownerWithdrawFeeNumerator: number, ownerWithdrawFeeDenominator: number, hostFeeNumerator: number, hostFeeDenominator: number, curveType: number): Promise<TokenSwap>;
     console.log('creating token swap');
     // TODO FIX
-    // SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8 failed: invalid account data for instruction
-    // Error: InvalidAccountData
+    // Instruction: Init
+    // Program log: Error: The input account owner is not the program address
+    // SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8 failed: custom program error: 0x2
     // https://github.com/solana-labs/solana-program-library/issues/2745
     const tokenSwap = await TokenSwap.createTokenSwap(
         CONNECTION, //  connection: Connection, 
         new Account(feePayer.secretKey), // payer: Account, 
         new Account(tokenSwapAccount.secretKey), // tokenSwapAccount: Account, 
-        authority, //   authority: PublicKey, 
+        swapAuthority, //   authority: PublicKey, 
         tokenAccountX.address, // tokenAccountA: PublicKey, 
         tokenAccountY.address, // tokenAccountB: PublicKey, 
         mintPool, //  poolToken: PublicKey,
@@ -98,6 +112,7 @@ async function main() {
         tokenAccountPool.address, // tokenAccountPool: PublicKey, 
         TOKEN_SWAP_PROGRAM_ID, //  swapProgramId: PublicKey, 
         TOKEN_PROGRAM_ID, //  tokenProgramId: PublicKey
+        nonce,
         TRADING_FEE_NUMERATOR, //  tradeFeeNumerator: number, 
         TRADING_FEE_DENOMINATOR ,//  tradeFeeDenominator: number, 
         OWNER_TRADING_FEE_NUMERATOR, // ownerTradeFeeNumerator: number,  
@@ -142,6 +157,7 @@ async function getOrCreateATA(mint: PublicKey, feePayer: Signer, owner: PublicKe
         feePayer,
         mint,
         owner,
+        true,
     );
 }
 
