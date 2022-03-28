@@ -57,8 +57,6 @@ main().then(
 async function main() {
     console.log("Processing...");
 
-    // INITIALIZING SWAP PROGRAM
-
     // owner of the swap pool and token mint accounts
     const owner: Signer = await createUserWithLamports(2 * LAMPORTS_PER_SOL);
     const feePayer: Signer = owner;
