@@ -65,8 +65,6 @@ async function main() {
 
     const tokenSwap: TokenSwap = await createSwap(owner, feePayer);
 
-    // USERS DATA
-
     // If you do not have enough SOL in your wallet then you’ll not be able to add any tokens.
     // You’ll get the following error:
     // "Attempt to debit an account but found no record of a prior credit."
@@ -163,7 +161,7 @@ async function main() {
     await checkAccountAmmount({
         name: "User's Token X account", 
         account: userTokenXAccount,
-        expectedAmount: 88 // 2 tokens are gone for fees or something
+        expectedAmount: 88,
     });
 
     await checkAccountAmmount({
