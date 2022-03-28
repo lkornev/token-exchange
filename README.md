@@ -9,7 +9,8 @@ https://twitter.com/pencilflip/status/1459631153082552320?s=21
 3. cd <path-to-solana-program-library>/token-swap
 4. cargo build-bpf
 5. deploy <path-to-solana-program-library>/solana-program-library/target/deploy/spl_token_swap.so
-Note that spl_token_swap.so is not the default value the SPL offers to deploy, so you need to write the deploy path mannually.
+
+  Note that spl_token_swap.so is not the default value the SPL offers to deploy, so you need to write the deploy path mannually.
 
 ### Build
 1. npm install
