@@ -25,7 +25,7 @@ import {
     CurveType,
 } from '@solana/spl-token-swap';
 
-const IS_LOCAL_DEVELOPMENT = true;
+const IS_LOCAL_DEVELOPMENT = false;
 
 const TOKEN_SWAP_PROGRAM_ID: PublicKey = new PublicKey(
     IS_LOCAL_DEVELOPMENT 
@@ -184,7 +184,13 @@ async function createSwap(owner: Signer, feePayer: Signer): Promise<TokenSwap> {
     const tokenAccountX: TokenAccount = await getOrCreateATA(mintX, feePayer, swapAuthority);
     const tokenAccountY: TokenAccount = await getOrCreateATA(mintY, feePayer, swapAuthority);
     const tokenAccountPool: TokenAccount = await getOrCreateATA(mintPool, feePayer, owner.publicKey);
-    const feeAccount: TokenAccount = await getOrCreateATA(mintPool, feePayer, owner.publicKey);
+    const feeAccount: TokenAccount = await getOrCreateATA(
+        mintPool, 
+        feePayer,
+        // The docs https://spl.solana.com/token-swap says that this guy must be an owner.
+        // Who knows why. But it's not required in version of the token swap proram >= 1.3
+        new PublicKey('HfoTxFR1Tm6kGmWgYWD6J7YHVy1UwqSULUGVLXkJqaKN'), // MAGIC!!!!
+    );
 
     await mintTo(
         CONNECTION,
@@ -218,7 +224,7 @@ async function createSwap(owner: Signer, feePayer: Signer): Promise<TokenSwap> {
         tokenAccountPool.address, // tokenAccountPool: PublicKey, 
         TOKEN_SWAP_PROGRAM_ID, //  swapProgramId: PublicKey, 
         TOKEN_PROGRAM_ID, //  tokenProgramId: PublicKey
-        // nonce, // Used in version 1.2 (not needed since 1.3)
+        nonce, // Used in version 1.2 (not needed since 1.3)
         TRADING_FEE_NUMERATOR, //  tradeFeeNumerator: number, 
         TRADING_FEE_DENOMINATOR ,//  tradeFeeDenominator: number, 
         OWNER_TRADING_FEE_NUMERATOR, // ownerTradeFeeNumerator: number,  
