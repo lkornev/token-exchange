@@ -188,7 +188,6 @@ async function createSwap(owner: Signer, feePayer: Signer): Promise<TokenSwap> {
         mintPool, 
         feePayer,
         // The docs https://spl.solana.com/token-swap says that this guy must be an owner.
-        // Who knows why. But it's not required in version of the token swap proram >= 1.3
         new PublicKey('HfoTxFR1Tm6kGmWgYWD6J7YHVy1UwqSULUGVLXkJqaKN'), // MAGIC!!!!
     );
 
