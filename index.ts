@@ -122,7 +122,7 @@ async function main() {
             swapAmmountIn, // Maximum number of tokens the delegate may transfer
         ),
     );
-    await sendAndConfirmTransaction( CONNECTION, createTransferAuthorityTx, [ user ]);
+    await sendAndConfirmTransaction(CONNECTION, createTransferAuthorityTx, [ user ]);
 
     // And then the swap ix will transfer tokens from the poll destination token account 
     // into the user's destination token account.
