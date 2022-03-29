@@ -187,7 +187,7 @@ async function createSwap(owner: Signer, feePayer: Signer): Promise<TokenSwap> {
     const feeAccount: TokenAccount = await getOrCreateATA(
         mintPool, 
         feePayer,
-        // The docs https://spl.solana.com/token-swap says that this guy must be an owner.
+        // The docs https://spl.solana.com/token-swap says that this guy must be the owner.
         new PublicKey('HfoTxFR1Tm6kGmWgYWD6J7YHVy1UwqSULUGVLXkJqaKN'), // MAGIC!!!!
     );
 
